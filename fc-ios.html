@@ -35,6 +35,40 @@
     ::-webkit-scrollbar-track { background:transparent; }
     ::-webkit-scrollbar-thumb { background:#2d3748; border-radius:4px; }
 
+    /* ─── TELEGRAM BADGE (only social badge) ─── */
+    #tgBadge{
+      position:fixed;
+      top:max(14px,env(safe-area-inset-top));
+      left:max(14px,env(safe-area-inset-left));
+      z-index:10001;
+      display:inline-flex;align-items:center;gap:10px;
+      padding:11px 20px;
+      background:linear-gradient(135deg,#1e88e5,#1565c0);
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      letter-spacing:.3px;
+      text-decoration:none;
+      border-radius:12px;
+      box-shadow:0 4px 14px rgba(0,0,0,0.5);
+      transition:transform .2s ease,box-shadow .2s ease;
+      -webkit-tap-highlight-color:transparent;
+      font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    }
+    #tgBadge:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(30,136,229,0.55)}
+    #tgBadge:active{transform:scale(.97)}
+    #tgBadge svg{width:20px;height:20px;flex-shrink:0;fill:#fff}
+    #tgBadge span{white-space:nowrap}
+
+    @media (max-width:400px){
+      #tgBadge{padding:9px 15px;font-size:13px;gap:8px}
+      #tgBadge svg{width:17px;height:17px}
+    }
+    @media (max-width:340px){
+      #tgBadge span{display:none}
+      #tgBadge{padding:9px 12px}
+    }
+
     #overlay {
       position:fixed; inset:0; background:var(--bg); z-index:9999;
       display:flex; align-items:center; justify-content:center; flex-direction:column; gap:16px;
@@ -373,81 +407,11 @@
       #quality-menu { min-width:120px; }
     }
 
-    .player-toolbar {
-      position:fixed; top:max(14px,env(safe-area-inset-top));
-      left:max(14px,env(safe-area-inset-left)); z-index:9998;
-      display:none; align-items:center; gap:8px;
-    }
-    .player-toolbar.show { display:flex; }
-    .back-btn {
-      padding:7px 14px; background:rgba(11,14,26,.85);
-      border:1px solid rgba(255,255,255,.1); border-radius:10px; color:#fff;
-      font-size:11px; font-weight:600; cursor:pointer; text-decoration:none;
-      display:inline-flex; align-items:center; gap:6px;
-      backdrop-filter:blur(10px); font-family:inherit; transition:all .2s;
-    }
-    .back-btn:hover { border-color:var(--accent); }
-    .back-btn svg { width:14px; height:14px; }
-
-    #socialBadges{
-      position:fixed;
-      top:max(58px, calc(env(safe-area-inset-top) + 58px));
-      left:max(14px, env(safe-area-inset-left));
-      z-index:10000;
-      display:none;
-      flex-direction:column;
-      gap:6px;
-    }
-    #socialBadges.show{display:flex}
-
-    .soc-badge{
-      display:flex; align-items:center; gap:6px;
-      padding:5px 11px 5px 6px; border-radius:12px;
-      text-decoration:none; color:#fff;
-      font-family:'Inter',system-ui,sans-serif;
-      font-weight:700; font-size:12px; letter-spacing:.3px;
-      border:1px solid rgba(255,255,255,.15);
-      backdrop-filter:blur(10px);
-      -webkit-backdrop-filter:blur(10px);
-      transition:transform .2s ease, box-shadow .2s ease;
-      -webkit-tap-highlight-color:transparent;
-    }
-    .soc-badge:hover{transform:translateY(-2px)}
-    .soc-badge:active{transform:scale(.96)}
-
-    .tg-badge{
-      background:linear-gradient(135deg,#2AABEE 0%,#229ED9 55%,#1c7fc4 100%);
-      box-shadow:0 8px 22px rgba(42,171,238,.4);
-    }
-    .tg-badge:hover{ box-shadow:0 12px 30px rgba(42,171,238,.6); }
-
-    .wa-badge{
-      background:linear-gradient(135deg,#25d366 0%,#128c7e 100%);
-      box-shadow:0 8px 22px rgba(37,211,102,.4);
-    }
-    .wa-badge:hover{ box-shadow:0 12px 30px rgba(37,211,102,.6); }
-
-    .soc-badge svg{
-      width:16px; height:16px; flex-shrink:0; fill:#fff;
-      filter:drop-shadow(0 1px 3px rgba(0,0,0,.25));
-    }
-    .soc-badge span{white-space:nowrap}
-
     @media (max-width:640px){
       #content-wrap { padding:20px 16px 40px; }
       #ch-grid { grid-template-columns:1fr; gap:14px; }
       #header-inner { padding:0; }
       #app-header { padding:0 16px; }
-
-      .soc-badge{
-        padding:0; width:40px; height:40px;
-        justify-content:center; border-radius:50%; gap:0;
-      }
-      .soc-badge span{display:none}
-      .soc-badge svg{width:18px;height:18px}
-      #socialBadges{
-        top:max(56px, calc(env(safe-area-inset-top) + 56px));
-      }
     }
     @media (min-width:641px) and (max-width:1024px) {
       #ch-grid { grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); }
@@ -543,6 +507,14 @@
 </head>
 <body>
 
+<!-- ✅ Single Telegram badge, only social element -->
+<a id="tgBadge" href="https://t.me/sportlink10" target="_blank" rel="noopener" title="@SPORTLINK10">
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+  </svg>
+  <span>@SPORTLINK10</span>
+</a>
+
 <div id="overlay">
   <svg width="36" height="36" viewBox="0 0 40 40" fill="none">
     <circle cx="20" cy="20" r="16" stroke="#1e2a45" stroke-width="4"/>
@@ -552,15 +524,6 @@
 </div>
 
 <div id="status"></div>
-
-<div class="player-toolbar" id="playerToolbar">
-  <button class="back-btn" id="backBtn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M19 12H5M12 19l-7-7 7-7"/>
-    </svg>
-    Back
-  </button>
-</div>
 
 <header id="app-header">
   <div id="header-inner">
@@ -623,21 +586,6 @@
   </div>
 </div>
 
-<div id="socialBadges">
-  <a class="soc-badge tg-badge" href="https://t.me/sportlink10" target="_blank" rel="noopener" title="Sportlink on Telegram">
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
-    </svg>
-    <span>Sportlink</span>
-  </a>
-  <a class="soc-badge wa-badge" href="https://www.whatsapp.com/channel/0029VbC2oQsC6ZvmwpR3v73v" target="_blank" rel="noopener" title="Sportlink on WhatsApp">
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-    </svg>
-    <span>Sportlink</span>
-  </a>
-</div>
-
 <div id="tgOverlay">
   <div id="tgCard">
     <div id="tgIcon">
@@ -680,13 +628,10 @@ var $grid      = document.getElementById("ch-grid");
 var $filter    = document.getElementById("category-filter");
 var $pCont     = document.getElementById("player-container");
 var $video     = document.getElementById("player");
-var $backBtn   = document.getElementById("backBtn");
-var $toolbar   = document.getElementById("playerToolbar");
 var $themeBtn  = document.getElementById("theme-toggle");
 var $liveHead  = document.getElementById("live-section-head");
 var $liveCount = document.getElementById("live-count");
 var $empty     = document.getElementById("empty-state");
-var $socialBadges = document.getElementById("socialBadges");
 var $qualityWrap = document.getElementById("quality-wrap");
 var $qualityBtn  = document.getElementById("quality-btn");
 var $qualityMenu = document.getElementById("quality-menu");
@@ -961,8 +906,6 @@ function renderList(matches){
 function showPlayer(){
   $list.classList.remove('visible');
   $pCont.style.display = 'flex';
-  $toolbar.classList.add('show');
-  if($socialBadges) $socialBadges.classList.add('show');
   if (typeof window.showTelegramPopup === 'function') {
     window.showTelegramPopup();
   }
@@ -1136,9 +1079,7 @@ function hidePlayer(){
   } catch(e){}
 
   $pCont.style.display = 'none';
-  $toolbar.classList.remove('show');
   $list.classList.add('visible');
-  if($socialBadges) $socialBadges.classList.remove('show');
   closeQualityMenu();
   destroyPlayer();
   if(window.history && window.history.pushState)
@@ -1495,12 +1436,10 @@ function errMsg(msg){
   $overlay.style.display = 'flex';
   toast(msg, 'err', 0);
   $list.classList.add('visible');
-  if($socialBadges) $socialBadges.classList.remove('show');
   if($qualityWrap) $qualityWrap.classList.remove('show');
 }
 
 // ── EVENTS ──
-$backBtn.addEventListener('click', hidePlayer);
 window.addEventListener('popstate', function(){
   if($pCont.style.display === 'flex') hidePlayer();
 });
