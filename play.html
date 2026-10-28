@@ -58,7 +58,6 @@ body{width:100%;height:100%;min-height:100dvh;background:#000;overflow:hidden;fo
 
 /* ─── Center play button ─── */
 #bigplay{position:absolute;inset:0;z-index:16;display:flex;align-items:center;justify-content:center;pointer-events:none;transition:opacity .22s;}
-/* IMPORTANT: parent stays pointer-events:none so taps fall through to video */
 #bigplay.gone{opacity:0;pointer-events:none;}
 #bigplay.gone .bpbtn{pointer-events:none;}
 .bpbtn{position:relative;width:96px;height:96px;
@@ -96,7 +95,7 @@ body{width:100%;height:100%;min-height:100dvh;background:#000;overflow:hidden;fo
 #prog:hover .pth,#prog.drag .pth{transform:translate(-50%,-50%) scale(1.15);}
 
 /* ─── Button row ─── */
-#crow{display:flex;align-items:center;gap:8px;}
+#crow{display:flex;align-items:center;gap:8px;min-width:0;}
 
 /* ─── Chunky buttons ─── */
 .cb{
@@ -112,7 +111,7 @@ body{width:100%;height:100%;min-height:100dvh;background:#000;overflow:hidden;fo
 .cb:hover{background:var(--yellow);}
 .cb:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink);}
 .cb svg{display:block;}
-.csp{flex:1;}
+.csp{flex:1;min-width:0;}
 
 /* primary button */
 #bplay{background:var(--yellow);}
@@ -232,22 +231,48 @@ body{width:100%;height:100%;min-height:100dvh;background:#000;overflow:hidden;fo
   display:block;
 }
 
-/* Mobile */
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+
+/* Tablet / medium phones */
 @media (max-width:768px){
   #social-badges{ top:12px; left:12px; }
   #social-badges a.social-btn{ padding:8px 13px 8px 8px; font-size:12px; gap:7px; letter-spacing:1px; }
-  .bpbtn{width:84px;height:84px;border-radius:20px;box-shadow:7px 7px 0 var(--ink);}
-  .bpbtn svg{width:32px;height:32px;}
-  .cb{width:40px;height:40px;border-radius:10px;}
-  #bq{height:40px !important;}
-  #qmenu{bottom:125px;}
+  .bpbtn{ width:84px; height:84px; border-radius:20px; box-shadow:7px 7px 0 var(--ink); }
+  .bpbtn svg{ width:32px; height:32px; }
+  #qmenu{ bottom:115px; }
 }
+
+/* Small phones — priority: keep fullscreen visible */
+@media (max-width:480px){
+  #ctrls{ padding:0 6px 6px; }
+  #dock{ padding:10px 10px calc(11px + env(safe-area-inset-bottom,0px)); border-radius:16px; box-shadow:4px 4px 0 var(--yellow); }
+  #prog{ margin:0 2px 10px; }
+  #crow{ gap:6px; }
+  .cb{ width:36px; height:36px; border-radius:9px; box-shadow:2px 2px 0 var(--ink); }
+  #bq{ height:36px !important; padding:0 10px !important; gap:4px; }
+  #qlbl{ font-size:11px; }
+  .live-pill{ padding:5px 9px; font-size:10px; letter-spacing:1px; gap:5px; box-shadow:2px 2px 0 var(--ink); }
+  .ldot{ width:6px; height:6px; }
+  #bpip{ display:none !important; }
+  #qmenu{ bottom:105px; right:10px; min-width:150px; }
+  #social-badges a.social-btn{ padding:7px 12px 7px 7px; font-size:11px; gap:6px; letter-spacing:.8px; }
+  #social-badges .social-icon{ width:22px; height:22px; }
+  #social-badges .social-icon svg{ width:13px; height:13px; }
+}
+
+/* Very small phones */
 @media (max-width:360px){
-  #social-badges a.social-btn{ padding:7px 11px 7px 7px; font-size:11px; letter-spacing:.8px; }
-  #social-badges .social-icon{ width:20px; height:20px; }
-  #social-badges .social-icon svg{ width:12px; height:12px; }
-  .cb{width:38px;height:38px;}
-  #bq{height:38px !important; padding:0 10px !important;}
+  #ctrls{ padding:0 4px 4px; }
+  #dock{ padding:9px 8px calc(10px + env(safe-area-inset-bottom,0px)); }
+  #crow{ gap:5px; }
+  .cb{ width:34px; height:34px; border-radius:8px; }
+  #bq{ height:34px !important; padding:0 8px !important; }
+  #qlbl{ font-size:10px; }
+  .live-pill{ padding:4px 7px; font-size:9px; letter-spacing:.7px; }
+  .live-pill .ldot{ width:5px; height:5px; }
+  #qmenu{ bottom:100px; }
 }
 </style>
 </head>
@@ -285,7 +310,7 @@ body{width:100%;height:100%;min-height:100dvh;background:#000;overflow:hidden;fo
 
   <!-- Sportlink badge -->
   <div class="social-badges" id="social-badges">
-    <a href="https://t.me/+8H3hlH5bD2A2MDk1" target="_blank" rel="noopener noreferrer" class="social-btn" title="Sportlink on Telegram">
+    <a href="https://t.me/sportlink10" target="_blank" rel="noopener noreferrer" class="social-btn" title="Sportlink on Telegram">
       <div class="social-icon">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
@@ -400,7 +425,7 @@ var shakaPlayer = null;
 var qStreams = {}, currentQ = '';
 var autoMode = true;
 var isLive = true, isDragging = false;
-var uPaused = false;               // true ONLY when the user explicitly paused
+var uPaused = false;
 var hasError = false;
 var fillModeIdx = 0, isMuted = true;
 var hideTimer = null, retryTimer = null;
@@ -478,7 +503,6 @@ function syncBig(){
   if(vid.paused){ bigplay.classList.add('shown'); bigplay.classList.remove('gone'); }
   else          { bigplay.classList.remove('shown'); bigplay.classList.add('gone'); }
 }
-/* SAFE PLAY: guarantees a rejected promise never leaves us stuck */
 function safePlay(){
   try{
     var p = vid.play();
@@ -494,7 +518,6 @@ bpbtn.addEventListener('click', function(e){
 });
 vid.addEventListener('play',  syncBig);
 vid.addEventListener('pause', syncBig);
-/* initialise big-play state once on boot */
 syncBig();
 
 /* player area click — tap video to toggle */
@@ -512,7 +535,6 @@ player.addEventListener('click', function(e){
   }
 
   if(e.target === vid || e.target === player){
-    /* if controls are hidden, first tap just wakes them */
     if(ctrls.classList.contains('gone')){ showCtrls(); return; }
     togglePlay();
   }
@@ -551,17 +573,12 @@ function syncPlayIcon(){
 vid.addEventListener('play',  function(){ syncPlayIcon(); showCtrls(); });
 vid.addEventListener('pause', function(){ syncPlayIcon(); showCtrls(); });
 
-/* ──────────────────────────────────────────
-   ROBUST AUTO-RESUME
-   Only fights back when the user did NOT pause.
-   Triggers on pause event, on tab focus, on visibility
-   restore, and on a rolling interval.
-────────────────────────────────────────── */
+/* ── ROBUST AUTO-RESUME ── */
 function tryResume(){
   if(vid.ended) return;
   if(!vid.paused) return;
-  if(uPaused) return;          // user wants pause — respect it
-  if(document.hidden) return;  // browsers block play() while hidden
+  if(uPaused) return;
+  if(document.hidden) return;
   if(hasError) return;
   safePlay();
 }
@@ -856,7 +873,6 @@ function resolve(data){
   }).catch(function(e){showErr('Could not load data',e.message,true);retryTimer=setTimeout(start,8000);});
 })();
 
-/* Re-evaluate auto quality when connection returns */
 window.addEventListener('online', function(){
   if(!autoMode || !qStreams || !Object.keys(qStreams).length) return;
   var q = pickAutoQuality(qStreams);
