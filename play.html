@@ -58,15 +58,17 @@ body{width:100%;height:100%;min-height:100dvh;background:#000;overflow:hidden;fo
 
 /* ─── Center play button ─── */
 #bigplay{position:absolute;inset:0;z-index:16;display:flex;align-items:center;justify-content:center;pointer-events:none;transition:opacity .22s;}
-#bigplay.shown{pointer-events:auto;}
+/* IMPORTANT: parent stays pointer-events:none so taps fall through to video */
 #bigplay.gone{opacity:0;pointer-events:none;}
+#bigplay.gone .bpbtn{pointer-events:none;}
 .bpbtn{position:relative;width:96px;height:96px;
   background:var(--yellow);
   border:4px solid var(--ink);
   border-radius:22px;
   box-shadow:8px 8px 0 var(--ink);
   display:flex;align-items:center;justify-content:center;cursor:pointer;
-  transition:transform .12s,box-shadow .12s,background .15s;}
+  transition:transform .12s,box-shadow .12s,background .15s;
+  pointer-events:auto;}
 .bpbtn::after{content:'';position:absolute;inset:-14px;border:2px dashed rgba(255,255,255,.55);border-radius:30px;pointer-events:none;}
 .bpbtn:hover{background:#ffe14d;transform:translate(-2px,-2px);box-shadow:10px 10px 0 var(--ink);}
 .bpbtn:active{transform:translate(8px,8px);box-shadow:0 0 0 var(--ink);}
@@ -397,7 +399,9 @@ var qlist    = document.getElementById('qlist');
 var shakaPlayer = null;
 var qStreams = {}, currentQ = '';
 var autoMode = true;
-var isLive = true, isDragging = false, uPaused = false, hasError = false;
+var isLive = true, isDragging = false;
+var uPaused = false;               // true ONLY when the user explicitly paused
+var hasError = false;
 var fillModeIdx = 0, isMuted = true;
 var hideTimer = null, retryTimer = null;
 var playerActivated = false;
@@ -469,26 +473,37 @@ vid.addEventListener('waiting', function(){ bufspin.style.display='block'; });
 vid.addEventListener('playing', function(){ bufspin.style.display='none'; });
 vid.addEventListener('canplay', function(){ bufspin.style.display='none'; });
 
-/* center play button */
+/* center play button visibility */
 function syncBig(){
-  if(vid.paused){bigplay.classList.add('shown');bigplay.classList.remove('gone');}
-  else{bigplay.classList.remove('shown');bigplay.classList.add('gone');}
+  if(vid.paused){ bigplay.classList.add('shown'); bigplay.classList.remove('gone'); }
+  else          { bigplay.classList.remove('shown'); bigplay.classList.add('gone'); }
 }
+/* SAFE PLAY: guarantees a rejected promise never leaves us stuck */
+function safePlay(){
+  try{
+    var p = vid.play();
+    if(p && typeof p.catch === 'function') p.catch(function(){});
+  }catch(e){}
+}
+
 bpbtn.addEventListener('click', function(e){
   e.stopPropagation();
-  uPaused=false;
-  playerActivated=true;
-  vid.play().catch(function(){});
+  uPaused = false;
+  playerActivated = true;
+  safePlay();
 });
 vid.addEventListener('play',  syncBig);
 vid.addEventListener('pause', syncBig);
+/* initialise big-play state once on boot */
+syncBig();
 
-/* player area click */
+/* player area click — tap video to toggle */
 player.addEventListener('click', function(e){
   if(e.target.closest('#dock')) return;
   if(e.target.closest('.bpbtn')) return;
   if(e.target.closest('#qmenu')) return;
   if(e.target.closest('#social-badges')) return;
+  if(e.target.closest('#err-ov')) return;
 
   if(!playerActivated){
     playerActivated = true;
@@ -497,6 +512,7 @@ player.addEventListener('click', function(e){
   }
 
   if(e.target === vid || e.target === player){
+    /* if controls are hidden, first tap just wakes them */
     if(ctrls.classList.contains('gone')){ showCtrls(); return; }
     togglePlay();
   }
@@ -518,8 +534,13 @@ showCtrls();
 
 /* play/pause */
 function togglePlay(){
-  if(vid.paused){ uPaused=false; vid.play().catch(function(){}); }
-  else{ uPaused=true; vid.pause(); }
+  if(vid.paused){
+    uPaused = false;
+    safePlay();
+  } else {
+    uPaused = true;
+    try{ vid.pause(); }catch(e){}
+  }
 }
 bplay.addEventListener('click', function(e){ e.stopPropagation(); togglePlay(); });
 function syncPlayIcon(){
@@ -530,13 +551,37 @@ function syncPlayIcon(){
 vid.addEventListener('play',  function(){ syncPlayIcon(); showCtrls(); });
 vid.addEventListener('pause', function(){ syncPlayIcon(); showCtrls(); });
 
-/* auto-resume */
+/* ──────────────────────────────────────────
+   ROBUST AUTO-RESUME
+   Only fights back when the user did NOT pause.
+   Triggers on pause event, on tab focus, on visibility
+   restore, and on a rolling interval.
+────────────────────────────────────────── */
+function tryResume(){
+  if(vid.ended) return;
+  if(!vid.paused) return;
+  if(uPaused) return;          // user wants pause — respect it
+  if(document.hidden) return;  // browsers block play() while hidden
+  if(hasError) return;
+  safePlay();
+}
 vid.addEventListener('pause', function(){
   if(!vid.ended && !uPaused){
-    setTimeout(function(){ if(vid.paused&&!vid.ended&&!uPaused) vid.play().catch(function(){}); },800);
+    setTimeout(tryResume, 600);
+    setTimeout(tryResume, 2000);
   }
 });
-setInterval(function(){ if(vid.paused&&!vid.ended&&!uPaused) vid.play().catch(function(){}); },4000);
+setInterval(tryResume, 3000);
+document.addEventListener('visibilitychange', function(){
+  if(!document.hidden) setTimeout(tryResume, 300);
+});
+window.addEventListener('focus', function(){ setTimeout(tryResume, 300); });
+document.addEventListener('fullscreenchange', function(){ setTimeout(tryResume, 500); });
+document.addEventListener('webkitfullscreenchange', function(){ setTimeout(tryResume, 500); });
+if(vid) {
+  vid.addEventListener('enterpictureinpicture', function(){ setTimeout(tryResume, 500); });
+  vid.addEventListener('leavepictureinpicture', function(){ setTimeout(tryResume, 500); });
+}
 
 /* mute */
 bvol.addEventListener('click', function(e){
@@ -560,7 +605,7 @@ livepill.addEventListener('click', function(){
   var edge=vid.seekable.end(vid.seekable.length-1);
   vid.currentTime=edge;
   uPaused=false;
-  if(vid.paused) vid.play().catch(function(){});
+  safePlay();
 });
 setInterval(function(){
   if(!isLive){livepill.style.display='none';return;}
@@ -655,6 +700,7 @@ function switchQ(q, keepAuto){
   currentQ = q;
   qlbl.textContent = q;
   if(!keepAuto) autoMode = false;
+  uPaused = false;
   loadStream(qStreams[q], []);
 }
 
@@ -738,7 +784,7 @@ async function loadStream(url,fallbacks){
   if(lastErr){showErr('Playback Error',lastErr,false);return;}
 
   vid.muted=true;
-  await vid.play().catch(function(){});
+  safePlay();
   syncVol();
 
   var onP=function(){vid.removeEventListener('playing',onP);hideOverlay();};
