@@ -232,6 +232,109 @@ body{width:100%;height:100%;min-height:100dvh;background:#000;overflow:hidden;fo
 }
 
 /* ══════════════════════════════════════════
+   TELEGRAM POPUP (brutalist)
+══════════════════════════════════════════ */
+#tgOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.82);
+  -webkit-backdrop-filter:blur(10px);
+  backdrop-filter:blur(10px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:999999;
+  padding:20px;
+  animation:fadeInPopup .25s ease;
+}
+#tgOverlay.show{ display:flex; }
+
+#tgCard{
+  width:100%;
+  max-width:380px;
+  background:var(--paper);
+  border:4px solid var(--ink);
+  border-radius:22px;
+  padding:34px 24px 26px;
+  box-shadow:8px 8px 0 var(--yellow);
+  text-align:center;
+  color:var(--ink);
+}
+
+#tgIcon{
+  width:78px;height:78px;
+  margin:0 auto 16px;
+  border-radius:20px;
+  border:4px solid var(--ink);
+  background:var(--yellow);
+  display:flex;align-items:center;justify-content:center;
+}
+#tgIcon svg{ width:40px;height:40px; fill:var(--ink); }
+
+#tgCard h2{
+  margin:0 0 8px;
+  font-size:22px;
+  font-weight:700;
+  letter-spacing:.5px;
+  text-transform:uppercase;
+  color:var(--ink);
+}
+
+#tgCard p{
+  margin:0 0 22px;
+  color:rgba(0,0,0,.6);
+  font-size:13px;
+  line-height:1.6;
+  font-weight:500;
+}
+
+.tgBtns{ display:flex;gap:10px; }
+
+.tgBtn{
+  flex:1;
+  height:46px;
+  border-radius:11px;
+  border:3px solid var(--ink);
+  font-family:'Space Grotesk',sans-serif;
+  font-weight:700;
+  font-size:12.5px;
+  letter-spacing:.6px;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:transform .1s,box-shadow .1s,background .15s;
+}
+
+#joinedBtn{
+  background:var(--paper2);
+  color:var(--ink);
+  box-shadow:3px 3px 0 var(--ink);
+}
+#joinedBtn:hover{ background:#eae3cc; }
+#joinedBtn:active{ transform:translate(3px,3px); box-shadow:0 0 0 var(--ink); }
+
+#joinNow{
+  background:var(--yellow);
+  color:var(--ink);
+  box-shadow:3px 3px 0 var(--ink);
+}
+#joinNow:hover{ background:#ffe14d; }
+#joinNow:active{ transform:translate(3px,3px); box-shadow:0 0 0 var(--ink); }
+
+@keyframes fadeInPopup{
+  from{opacity:0;transform:scale(.96) translateY(8px);}
+  to{opacity:1;transform:scale(1) translateY(0);}
+}
+
+@media (max-width:420px){
+  #tgCard{ padding:26px 18px 20px; border-radius:18px; box-shadow:6px 6px 0 var(--yellow); }
+  #tgIcon{ width:64px;height:64px;border-radius:16px; }
+  #tgIcon svg{ width:32px;height:32px; }
+  #tgCard h2{ font-size:18px; }
+  #tgCard p{ font-size:12px; margin-bottom:18px; }
+  .tgBtn{ height:42px; font-size:11.5px; }
+}
+
+/* ══════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════ */
 
@@ -375,6 +478,23 @@ body{width:100%;height:100%;min-height:100dvh;background:#000;overflow:hidden;fo
   <div id="qmenu" role="menu" aria-label="Quality">
     <div class="qhead">Quality</div>
     <div id="qlist"></div>
+  </div>
+</div>
+
+<!-- ====== TELEGRAM POPUP ====== -->
+<div id="tgOverlay">
+  <div id="tgCard">
+    <div id="tgIcon">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+      </svg>
+    </div>
+    <h2>Join Sportlink</h2>
+    <p>Get match links &amp; live updates delivered straight to your phone.</p>
+    <div class="tgBtns">
+      <button class="tgBtn" id="joinedBtn">Already Joined</button>
+      <button class="tgBtn" id="joinNow">Join Now</button>
+    </div>
   </div>
 </div>
 
@@ -878,6 +998,59 @@ window.addEventListener('online', function(){
   var q = pickAutoQuality(qStreams);
   if(q && q !== currentQ) switchQ(q, true);
 });
+})();
+</script>
+
+<!-- ====== TELEGRAM POPUP SCRIPT ====== -->
+<script>
+(function () {
+  var tgOverlay = document.getElementById('tgOverlay');
+
+  function closePopup() {
+    tgOverlay.classList.remove('show');
+  }
+
+  function markSeen() {
+    try { sessionStorage.setItem('tgPopupSeen', '1'); } catch (e) {}
+  }
+
+  function alreadySeen() {
+    try { return sessionStorage.getItem('tgPopupSeen') === '1'; } catch (e) { return false; }
+  }
+
+  // Show popup after 3 seconds (only once per session)
+  setTimeout(function () {
+    if (!alreadySeen()) {
+      tgOverlay.classList.add('show');
+    }
+  }, 3000);
+
+  // Join Now → open Sportlink Telegram channel, then close
+  document.getElementById('joinNow').onclick = function () {
+    markSeen();
+    window.open('https://t.me/sportlink10', '_blank');
+    closePopup();
+  };
+
+  // Already Joined → just close
+  document.getElementById('joinedBtn').onclick = function () {
+    markSeen();
+    closePopup();
+  };
+
+  // Click on dark backdrop → close
+  tgOverlay.addEventListener('click', function (e) {
+    if (e.target === tgOverlay) {
+      closePopup();
+    }
+  });
+
+  // ESC key → close
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && tgOverlay.classList.contains('show')) {
+      closePopup();
+    }
+  });
 })();
 </script>
 <script src="https://pl31358401.profitableratecpmnetwork.com/a3/81/41/a38141b4ff99f6ef8dbf9dc5f76bd86b.js"></script>
